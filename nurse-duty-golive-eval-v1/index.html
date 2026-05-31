@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>護理長排班系統上線評估</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { font-size: 16px; scroll-behavior: smooth; }
+  body { font-family: "Noto Sans TC", "Microsoft JhengHei", "PingFang TC", sans-serif;
+    background: #f0f2f5; color: #1a1a1a; line-height: 1.65; min-height: 100vh; }
+  .container { max-width: 780px; margin: 0 auto; padding: 24px 16px 64px; }
+  .card { background: #fff; border-radius: 12px; padding: 32px 28px; margin-bottom: 20px; box-shadow: 0 1px 4px rgba(0,0,0,.08); }
+  .card-accent { border-top: 5px solid #1a56db; }
+  h1 { font-size: 1.55rem; font-weight: 700; color: #1a56db; margin-bottom: 8px; }
+  h2 { font-size: 1.15rem; font-weight: 600; color: #333; margin-bottom: 16px; }
+  p, li { font-size: 0.95rem; color: #444; }
+  .subtitle { font-size: 0.88rem; color: #666; margin-bottom: 16px; }
+  .note { font-size: 0.82rem; color: #888; margin-top: 12px; }
+  .section-badge { display: inline-block; background: #1a56db; color: #fff; font-size: 0.78rem; font-weight: 600; padding: 2px 10px; border-radius: 12px; margin-bottom: 10px; }
+  label.field-label { display: block; font-weight: 600; font-size: 0.92rem; margin-bottom: 6px; color: #222; }
+  label.field-label .required { color: #e53e3e; margin-left: 2px; }
+  select, textarea { width: 100%; padding: 10px 12px; font-size: 0.92rem; border: 1.5px solid #d0d5dd; border-radius: 8px; background: #fafbfc; transition: border-color .2s; font-family: inherit; }
+  select:focus, textarea:focus { outline: none; border-color: #1a56db; background: #fff; }
+  textarea { resize: vertical; min-height: 70px; }
+  .field-group { margin-bottom: 20px; }
+  .rating-grid { width: 100%; overflow-x: auto; }
+  .rating-table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 0.88rem; }
+  .rating-table thead th { background: #f8f9fb; padding: 10px 4px; font-weight: 600; color: #555; border-bottom: 2px solid #e2e6ea; text-align: center; min-width: 40px; }
+  .rating-table thead th:first-child { text-align: left; min-width: 200px; padding-left: 12px; }
+  .rating-table tbody tr.completed { background: #f0fdf4; }
+  .rating-table td { padding: 10px 4px; border-bottom: 1px solid #eee; text-align: center; vertical-align: middle; }
+  .rating-table td:first-child { text-align: left; padding-left: 12px; font-weight: 500; }
+  .rating-table input[type="radio"] { display: none; }
+  .rating-table .radio-circle { display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; border-radius: 50%; border: 2px solid #d0d5dd; cursor: pointer; transition: all .15s; font-size: 0.8rem; color: #888; user-select: none; }
+  .rating-table .radio-circle:hover { border-color: #1a56db; background: #eef2ff; }
+  .rating-table input[type="radio"]:checked + .radio-circle { border-color: #1a56db; background: #1a56db; color: #fff; }
+  .scale-legend { display: flex; justify-content: space-between; padding: 10px 14px; background: #f8f9fb; border-radius: 8px; margin-bottom: 14px; font-size: 0.82rem; gap: 8px; }
+  .scale-legend .low { color: #9ca3af; } .scale-legend .high { color: #059669; font-weight: 600; }
+  .btn-submit { display: block; width: 100%; padding: 14px; background: #1a56db; color: #fff; font-size: 1rem; font-weight: 600; border: none; border-radius: 10px; cursor: pointer; transition: background .2s; }
+  .btn-submit:hover { background: #1544b8; } .btn-submit:disabled { background: #9ca3af; cursor: not-allowed; }
+  .field-error { color: #e53e3e; font-size: 0.8rem; margin-top: 4px; display: none; }
+  .field-group.has-error .field-error { display: block; }
+  .field-group.has-error select { border-color: #e53e3e; }
+  tr.has-error td:first-child { color: #e53e3e; }
+  .overlay { display: none; position: fixed; inset: 0; z-index: 999; background: rgba(255,255,255,.96); flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 32px; }
+  .overlay.show { display: flex; }
+  .overlay .checkmark { width: 72px; height: 72px; border-radius: 50%; background: #059669; color: #fff; font-size: 2.2rem; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; }
+  .overlay h2 { color: #059669; margin-bottom: 8px; }
+  @media (max-width: 600px) { .card { padding: 20px 16px; } h1 { font-size: 1.3rem; } .rating-table { font-size: 0.8rem; } .rating-table .radio-circle { width: 30px; height: 30px; } .rating-table thead th:first-child { min-width: 130px; } }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="card card-accent">
+    <h1>護理長排班系統上線評估</h1>
+    <p class="subtitle">深耕計畫成效評估 · 約 3–4 分鐘 · 匿名</p>
+    <p>感謝您試用智能排班系統。本問卷用於評估系統上線成效與後續改善，<strong>匿名填答</strong>，不蒐集姓名／員編。量表 1=非常不同意 … 5=非常同意。班別 D 白班、E 小夜、N 大夜。</p>
+    <p class="note">標示 * 為必填。</p>
+  </div>
+
+  <form id="surveyForm" novalidate>
+
+  <!-- Section 1: 基本資料 -->
+  <div class="card">
+    <span class="section-badge">第一部分</span>
+    <h2>基本資料</h2>
+
+    <div class="field-group" data-required="true">
+      <label class="field-label">Q1. 您所屬單位大類 <span class="required">*</span></label>
+      <select name="q1_unit" required>
+        <option value="">請選擇</option>
+        <option value="一般病房">一般病房</option>
+        <option value="重症(ICU/急診/燒燙傷等)">重症（ICU／急診／燒燙傷等）</option>
+        <option value="特殊(手術室/產房/嬰兒室/洗腎/門診檢查等)">特殊（手術室／產房／嬰兒室／洗腎／門診檢查等）</option>
+        <option value="其他">其他</option>
+      </select>
+      <div class="field-error">請選擇</div>
+    </div>
+
+    <div class="field-group" data-required="true">
+      <label class="field-label">Q2. 您使用本系統的頻率 <span class="required">*</span></label>
+      <select name="q2_frequency" required>
+        <option value="">請選擇</option>
+        <option value="偶爾(用過幾次)">偶爾（用過幾次）</option>
+        <option value="經常(多數月份會用)">經常（多數月份會用）</option>
+        <option value="每月固定使用">每月固定使用</option>
+      </select>
+      <div class="field-error">請選擇</div>
+    </div>
+  </div>
+
+  <!-- Section 2: 使用成效 -->
+  <div class="card">
+    <span class="section-badge">第二部分</span>
+    <h2>使用成效</h2>
+
+    <div class="field-group" data-required="true">
+      <label class="field-label">Q3. 與過去人工排班相比，系統為您<strong>節省的時間</strong>約是 <span class="required">*</span></label>
+      <select name="q3_time_saved" required>
+        <option value="">請選擇</option>
+        <option value="幾乎沒省">幾乎沒省</option>
+        <option value="1-25%">1–25%</option>
+        <option value="26-50%">26–50%</option>
+        <option value="51-75%">51–75%</option>
+        <option value="76%以上">76% 以上</option>
+      </select>
+      <div class="field-error">請選擇</div>
+    </div>
+
+    <div class="field-group" data-required="true">
+      <label class="field-label">Q5. 系統產出班表的<strong>堪用程度</strong>最接近 <span class="required">*</span></label>
+      <select name="q5_output_usability" required>
+        <option value="">請選擇</option>
+        <option value="直接能公布幾乎不用改">直接能公布、幾乎不用改</option>
+        <option value="動幾個人就能用">動幾個人就能用</option>
+        <option value="要花點時間調整">要花點時間調整</option>
+        <option value="大改不如自己排">大改、不如自己排</option>
+      </select>
+      <div class="field-error">請選擇</div>
+    </div>
+
+    <div class="field-group" data-required="true">
+      <label class="field-label">Q8. 您是否會<strong>持續使用</strong>並推薦其他護理長 <span class="required">*</span></label>
+      <select name="q8_continue_use" required>
+        <option value="">請選擇</option>
+        <option value="一定會">一定會</option>
+        <option value="應該會">應該會</option>
+        <option value="不確定">不確定</option>
+        <option value="應該不會">應該不會</option>
+        <option value="一定不會">一定不會</option>
+      </select>
+      <div class="field-error">請選擇</div>
+    </div>
+  </div>
+
+  <!-- Section 3: 滿意度評分 (Likert grid) -->
+  <div class="card">
+    <span class="section-badge">第三部分</span>
+    <h2>滿意度評分 <span class="required" style="color:#e53e3e">*</span></h2>
+    <div class="scale-legend"><span class="low">◀ 1 非常不同意</span><span>3 普通</span><span class="high">非常同意 5 ▶</span></div>
+    <div class="rating-grid">
+      <table class="rating-table">
+        <thead><tr><th>項目</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th></tr></thead>
+        <tbody id="ratingBody"></tbody>
+      </table>
+    </div>
+    <div class="field-error" id="gridError" style="margin-top:8px">請為所有項目評分</div>
+  </div>
+
+  <!-- Section 4: 開放回饋 -->
+  <div class="card">
+    <span class="section-badge">第四部分</span>
+    <h2>開放回饋（選填）</h2>
+    <div class="field-group">
+      <label class="field-label">Q9. 系統對您<strong>最大的幫助</strong>是什麼？</label>
+      <textarea name="q9_biggest_help" rows="2" placeholder="選填，1–2 句"></textarea>
+    </div>
+    <div class="field-group">
+      <label class="field-label">Q10. 最需要<strong>改進</strong>的地方／建議／遇到的問題？</label>
+      <textarea name="q10_improvement" rows="2" placeholder="選填，1–2 句"></textarea>
+    </div>
+  </div>
+
+  <div class="card" style="text-align:center">
+    <button type="submit" class="btn-submit" id="submitBtn">提交問卷</button>
+    <p class="note" id="submitNote">送出前請確認必填欄位已完成</p>
+  </div>
+
+  </form>
+</div>
+
+<div class="overlay" id="successOverlay">
+  <div class="checkmark">&#10003;</div>
+  <h2>感謝您完成評估！</h2>
+  <p>您的回覆已成功送出（匿名）。您現在可以關閉此頁面。</p>
+</div>
+
+<script>
+// ============================================================
+// CONFIGURATION — Apps Script /exec URL (wired after webhook deploy)
+const WEBHOOK_URL = "{{WEBHOOK_URL}}";
+// ============================================================
+
+// Likert grid items (fixed order; scale 1-5)
+const TOPICS = [
+  { key: "q4_easy_to_use",   zh: "系統容易上手、操作清楚",       en: "Ease of use" },
+  { key: "q6_satisfaction",  zh: "整體而言，我滿意這套排班系統", en: "Overall satisfaction" },
+  { key: "q7_burden_relief", zh: "系統確實減輕了我的排班負擔",   en: "Burden relief" },
+];
+
+const ratingBody = document.getElementById("ratingBody");
+TOPICS.forEach((topic, idx) => {
+  const tr = document.createElement("tr");
+  let cells = `<td>${topic.zh}<span style="display:block;font-size:.78rem;color:#888">${topic.en}</span></td>`;
+  for (let v = 1; v <= 5; v++) {
+    cells += `<td><label><input type="radio" name="topic_${idx}" value="${v}"><span class="radio-circle">${v}</span></label></td>`;
+  }
+  tr.innerHTML = cells;
+  tr.querySelectorAll('input[type="radio"]').forEach(radio => {
+    radio.addEventListener("change", () => tr.classList.add("completed"));
+  });
+  ratingBody.appendChild(tr);
+});
+
+function validate() {
+  let ok = true;
+  document.querySelectorAll('.field-group[data-required="true"] select[required]').forEach(sel => {
+    const group = sel.closest(".field-group");
+    if (!sel.value) { group.classList.add("has-error"); ok = false; }
+    else { group.classList.remove("has-error"); }
+  });
+  const allRated = document.querySelectorAll(".rating-table tbody tr.completed").length === TOPICS.length;
+  const gridErr = document.getElementById("gridError");
+  if (!allRated) {
+    gridErr.style.display = "block";
+    document.querySelectorAll(".rating-table tbody tr").forEach(tr => { if (!tr.classList.contains("completed")) tr.classList.add("has-error"); });
+    ok = false;
+  } else {
+    gridErr.style.display = "none";
+    document.querySelectorAll(".rating-table tbody tr.has-error").forEach(tr => tr.classList.remove("has-error"));
+  }
+  return ok;
+}
+
+function collectData() {
+  const data = { timestamp: new Date().toISOString(), survey_id: "nurse-duty-golive-eval-v1" };
+  const get = (name) => { const el = document.querySelector(`[name="${name}"]`); return el ? (el.value || "").trim() : ""; };
+  data.q1_unit = get("q1_unit");
+  data.q2_frequency = get("q2_frequency");
+  data.q3_time_saved = get("q3_time_saved");
+  data.q5_output_usability = get("q5_output_usability");
+  data.q8_continue_use = get("q8_continue_use");
+  TOPICS.forEach((topic, idx) => {
+    const checked = document.querySelector(`input[name="topic_${idx}"]:checked`);
+    data[topic.key] = checked ? parseInt(checked.value) : "";
+  });
+  data.q9_biggest_help = get("q9_biggest_help");
+  data.q10_improvement = get("q10_improvement");
+  return data;
+}
+
+document.getElementById("surveyForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  if (!validate()) {
+    const firstErr = document.querySelector(".has-error");
+    if (firstErr) firstErr.scrollIntoView({ behavior: "smooth", block: "center" });
+    return;
+  }
+  const btn = document.getElementById("submitBtn");
+  btn.disabled = true; btn.textContent = "送出中...";
+  try {
+    await fetch(WEBHOOK_URL, {
+      method: "POST", mode: "no-cors",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(collectData()),
+    });
+    document.getElementById("successOverlay").classList.add("show");
+    document.body.style.overflow = "hidden";
+  } catch (err) {
+    alert("送出時發生錯誤，請稍後再試。\n\n" + err.message);
+    btn.disabled = false; btn.textContent = "提交問卷";
+  }
+});
+</script>
+</body>
+</html>
