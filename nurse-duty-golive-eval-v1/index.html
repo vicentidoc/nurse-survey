@@ -180,7 +180,7 @@
 <script>
 // ============================================================
 // CONFIGURATION — Apps Script /exec URL (wired after webhook deploy)
-const WEBHOOK_URL = "{{WEBHOOK_URL}}";
+const WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbwriG3sop5SfxWoPIOJf-5ufsEBUMu11vsA4iSsIj9brYYjC-P0j52BxUTWqi3lP7Jz/exec";
 // ============================================================
 
 // Likert grid items (fixed order; scale 1-5)
@@ -253,7 +253,7 @@ document.getElementById("surveyForm").addEventListener("submit", async (e) => {
   try {
     await fetch(WEBHOOK_URL, {
       method: "POST", mode: "no-cors",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
       body: JSON.stringify(collectData()),
     });
     document.getElementById("successOverlay").classList.add("show");
